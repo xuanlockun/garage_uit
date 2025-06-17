@@ -1,0 +1,134 @@
+package com.uit.garage.controller;
+
+import com.uit.garage.dao.PartsDAO;
+import com.uit.garage.dao.RepairDAO;
+import com.uit.garage.model.Part;
+import com.uit.garage.model.RepairDetail;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
+
+import java.time.LocalDate;
+
+public class RepairController {
+
+    @FXML private TextField licenseField;
+    @FXML private DatePicker repairDatePicker;
+    @FXML private TableView<RepairDetail> repairTable;
+
+    @FXML private TableColumn<RepairDetail, String> colContent;
+    @FXML private TableColumn<RepairDetail, Part> colPart;
+    @FXML private TableColumn<RepairDetail, Integer> colQuantity;
+    @FXML private TableColumn<RepairDetail, Double> colPrice;
+    @FXML private TableColumn<RepairDetail, Double> colLaborCost;
+    @FXML private TableColumn<RepairDetail, Double> colTotal;
+
+    private final ObservableList<RepairDetail> repairData = FXCollections.observableArrayList();
+    private final RepairDAO repairDAO = new RepairDAO();
+    private final PartsDAO partsDAO = new PartsDAO();
+
+    @FXML
+    public void initialize() {
+        ObservableList<Part> partsList = FXCollections.observableArrayList(partsDAO.getAllParts());
+
+        colContent.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        colContent.setCellFactory(TextFieldTableCell.forTableColumn());
+        colContent.setOnEditCommit(e -> e.getRowValue().setContent(e.getNewValue()));
+
+        colPart.setCellValueFactory(cellData -> cellData.getValue().partProperty());
+        colPart.setCellFactory(ComboBoxTableCell.forTableColumn(partsList));
+        colPart.setOnEditCommit(e -> {
+            e.getRowValue().setPart(e.getNewValue());
+            e.getRowValue().recalculateTotal();
+        });
+
+        colQuantity.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+        colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        colQuantity.setOnEditCommit(e -> {
+            e.getRowValue().setQuantity(e.getNewValue());
+            e.getRowValue().recalculateTotal();
+        });
+
+        colPrice.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
+        colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        colPrice.setOnEditCommit(e -> {
+            e.getRowValue().setPrice(e.getNewValue());
+            e.getRowValue().recalculateTotal();
+        });
+
+        colLaborCost.setCellValueFactory(cellData -> cellData.getValue().laborCostProperty().asObject());
+        colLaborCost.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        colLaborCost.setOnEditCommit(e -> {
+            e.getRowValue().setLaborCost(e.getNewValue());
+            e.getRowValue().recalculateTotal();
+        });
+
+        colTotal.setCellValueFactory(cellData -> cellData.getValue().totalProperty().asObject());
+
+        repairTable.setItems(repairData);
+        repairTable.setEditable(true);
+    }
+
+    @FXML
+    private void handleAddRow() {
+        Part defaultPart = partsDAO.getAllParts().isEmpty() ? null : partsDAO.getAllParts().get(0);
+        double price = (defaultPart != null) ? defaultPart.getPrice() : 0.0;
+
+        repairData.add(new RepairDetail("", defaultPart, 1, price, 0.0));
+    }
+    @FXML
+    private void handleSaveRepair() {
+        String license = licenseField.getText();
+        LocalDate date = repairDatePicker.getValue();
+
+        if (license.isEmpty() || date == null || repairData.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập đầy đủ thông tin.");
+            return;
+        }
+
+        boolean success = repairDAO.insertRepair(license, date, repairData);
+        if (success) {
+            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu sửa chữa.");
+            handleReset();
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu phiếu sửa chữa.");
+        }
+    }
+
+    @FXML
+    private void handleReset() {
+        licenseField.clear();
+        repairDatePicker.setValue(null);
+        repairData.clear();
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String msg) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+    @FXML
+    private void handleViewRepair() {
+        String license = licenseField.getText();
+
+        if (license.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập biển số xe để tra cứu.");
+            return;
+        }
+
+        ObservableList<RepairDetail> details = FXCollections.observableArrayList(repairDAO.getRepairsByLicense(license));
+        if (details.isEmpty()) {
+            showAlert(Alert.AlertType.INFORMATION, "Không có dữ liệu", "Không tìm thấy sửa chữa cho xe này.");
+        }
+
+        repairData.setAll(details);
+    }
+
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.uit.garage.UserController"
+      spacing="10"
+      alignment="CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <TableView fx:id="tableView" prefHeight="200">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10">
+        <TextField fx:id="tfName" promptText="Name"/>
+        <TextField fx:id="tfEmail" promptText="Email"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Button text="Add" onAction="#addUser"/>
+        <Button text="Update" onAction="#updateUser"/>
+        <Button text="Delete" onAction="#deleteUser"/>
+    </HBox>
+</VBox>

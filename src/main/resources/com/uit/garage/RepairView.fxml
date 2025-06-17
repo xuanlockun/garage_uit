@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.uit.garage.controller.RepairController">
+    <VBox spacing="10">
+        <Label text="PHIẾU SỬA CHỮA" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <padding>
+            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+        </padding>
+        <GridPane hgap="10" vgap="10">
+            <Label text="Biển số:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="licenseField" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+            <Label text="Ngày sửa chữa:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <DatePicker fx:id="repairDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        </GridPane>
+
+        <TableView fx:id="repairTable" editable="true" prefHeight="300">
+            <columns>
+                <TableColumn fx:id="colContent" text="Nội Dung" prefWidth="150" />
+                <TableColumn fx:id="colPart" text="Vật Tư Phụ Tùng" prefWidth="150" />
+                <TableColumn fx:id="colQuantity" text="Số Lượng" prefWidth="80" />
+                <TableColumn fx:id="colPrice" text="Đơn Giá" prefWidth="100" />
+                <TableColumn fx:id="colLaborCost" text="Tiền Công" prefWidth="100" />
+                <TableColumn fx:id="colTotal" text="Thành Tiền" prefWidth="120" />
+            </columns>
+        </TableView>
+
+        <HBox spacing="10">
+            <Button text="➕ Thêm dòng" onAction="#handleAddRow" />
+            <Button text="Xem sửa chữa" onAction="#handleViewRepair" />
+            <Button text="Lưu" onAction="#handleSaveRepair" />
+            <Button text="Làm mới" onAction="#handleReset" />
+        </HBox>
+
+    </VBox>
+</AnchorPane>
