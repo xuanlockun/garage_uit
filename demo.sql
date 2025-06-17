@@ -1,0 +1,15 @@
+INSERT INTO parts (name, price) VALUES
+('Bánh xe trước', 1200000),
+('Bánh xe sau', 1300000),
+('Dầu nhớt động cơ', 250000),
+('Lọc nhớt', 80000),
+('Lọc gió', 100000),
+('Bugi đánh lửa', 60000),
+('Má phanh trước', 450000),
+('Má phanh sau', 400000),
+('Bình ắc quy', 950000),
+('Gương chiếu hậu', 150000),
+('Cần gạt mưa', 90000),
+('Dây curoa cam', 700000),
+('Dây curoa tổng', 600000),
+('Lốc điều hòa', 1500000);

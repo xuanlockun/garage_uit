@@ -52,9 +52,17 @@ public class RepairController {
         colPart.setCellValueFactory(cellData -> cellData.getValue().partProperty());
         colPart.setCellFactory(ComboBoxTableCell.forTableColumn(partsList));
         colPart.setOnEditCommit(e -> {
-            e.getRowValue().setPart(e.getNewValue());
-            e.getRowValue().recalculateTotal();
+            RepairDetail detail = e.getRowValue();
+            Part selectedPart = e.getNewValue();
+
+            if (selectedPart != null) {
+                detail.setPart(selectedPart);
+                detail.setPrice(selectedPart.getPrice()); // 👈 cập nhật đơn giá theo part
+                detail.recalculateTotal();
+                repairTable.refresh(); // 👈 bắt buộc để TableView hiển thị lại
+            }
         });
+
 
         colQuantity.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
         colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
@@ -107,15 +115,13 @@ public class RepairController {
     }
     @FXML
     private void handleSaveRepair() {
-        String license = licenseField.getText();
-        LocalDate date = repairDatePicker.getValue();
-
-        if (license.isEmpty() || date == null || repairData.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập đầy đủ thông tin.");
+        ReceiptRow selectedReceipt = receiptTable.getSelectionModel().getSelectedItem();
+        if (selectedReceipt == null || repairData.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng chọn phiếu tiếp nhận và nhập nội dung sửa chữa.");
             return;
         }
 
-        boolean success = repairDAO.insertRepair(license, date, repairData);
+        boolean success = repairDAO.insertRepairDetails(selectedReceipt.getId(), repairData);
         if (success) {
             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu sửa chữa.");
             handleReset();
@@ -123,6 +129,7 @@ public class RepairController {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu phiếu sửa chữa.");
         }
     }
+
     private void loadReceiptList() {
         receiptList.clear();
         for (var r : repairDAO.getAllReceipts()) {

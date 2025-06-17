@@ -146,5 +146,53 @@ public class RepairDAO {
 
         return result;
     }
+    public boolean insertRepairDetails(int receiptId, List<RepairDetail> details) {
+        String insertSql = """
+        INSERT INTO repair_details (receipt_id, content, part_id, quantity, price, labor_cost, total, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """;
+
+        String updateSql = """
+        UPDATE repair_details SET content = ?, part_id = ?, quantity = ?, price = ?, labor_cost = ?, total = ?
+        WHERE id = ?
+    """;
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            conn.setAutoCommit(false);
+
+            for (RepairDetail detail : details) {
+                if (detail.getId() != null && detail.getId() > 0) {
+                    try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+                        stmt.setString(1, detail.getContent());
+                        stmt.setInt(2, detail.getPart().getId());
+                        stmt.setInt(3, detail.getQuantity());
+                        stmt.setDouble(4, detail.getPrice());
+                        stmt.setDouble(5, detail.getLaborCost());
+                        stmt.setDouble(6, detail.getTotal());
+                        stmt.setInt(7, detail.getId());
+                        stmt.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
+                        stmt.setInt(1, receiptId);
+                        stmt.setString(2, detail.getContent());
+                        stmt.setInt(3, detail.getPart().getId());
+                        stmt.setInt(4, detail.getQuantity());
+                        stmt.setDouble(5, detail.getPrice());
+                        stmt.setDouble(6, detail.getLaborCost());
+                        stmt.setDouble(7, detail.getTotal());
+                        stmt.executeUpdate();
+                    }
+                }
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

@@ -54,6 +54,7 @@ public class DBUtil {
                     "price REAL, " +
                     "labor_cost REAL, " +
                     "total REAL, " +
+                    "status TEXT DEFAULT 'pending'," +
                     "FOREIGN KEY(receipt_id) REFERENCES receipts(id), " +
                     "FOREIGN KEY(part_id) REFERENCES parts(id))";
             stmt.execute(repairDetailTable);

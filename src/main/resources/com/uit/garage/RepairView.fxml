@@ -14,22 +14,22 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.uit.garage.controller.RepairController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.uit.garage.controller.RepairController">
     <VBox spacing="10">
         <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="PHIẾU SỬA CHỮA" />
+       <TableView fx:id="receiptTable" prefHeight="150">
+           <columns>
+               <TableColumn fx:id="colReceiptId" prefWidth="80" text="Mã phiếu" />
+               <TableColumn fx:id="colLicense" prefWidth="120" text="Biển số" />
+               <TableColumn fx:id="colDate" prefWidth="120" text="Ngày tiếp nhận" />
+           </columns>
+       </TableView>
         <GridPane hgap="10" vgap="10">
             <Label text="Biển số:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
             <TextField fx:id="licenseField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
             <Label text="Ngày sửa chữa:" GridPane.rowIndex="2" />
             <DatePicker fx:id="repairDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-          <TableView fx:id="receiptTable" prefHeight="150" GridPane.columnIndex="1" GridPane.rowIndex="1">
-              <columns>
-                  <TableColumn fx:id="colReceiptId" prefWidth="80" text="Mã phiếu" />
-                  <TableColumn fx:id="colLicense" prefWidth="120" text="Biển số" />
-                  <TableColumn fx:id="colDate" prefWidth="120" text="Ngày tiếp nhận" />
-              </columns>
-          </TableView>
          <columnConstraints>
             <ColumnConstraints />
             <ColumnConstraints />
