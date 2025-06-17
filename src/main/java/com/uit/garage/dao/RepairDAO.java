@@ -118,5 +118,33 @@ public class RepairDAO {
 
         return list;
     }
+    private static final String DB_URL = "jdbc:sqlite:garage.db";
+    public List<ReceiptDisplay> getAllReceipts() {
+        List<ReceiptDisplay> result = new ArrayList<>();
+        String sql = """
+        SELECT receipts.id AS id, vehicles.license_plate AS license, receipts.receipt_date AS date
+        FROM receipts
+        JOIN vehicles ON receipts.vehicle_id = vehicles.id
+        ORDER BY receipts.id DESC
+    """;
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                result.add(new ReceiptDisplay(
+                        rs.getInt("id"),
+                        rs.getString("license"),
+                        rs.getString("date")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 
 }

@@ -1,40 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.uit.garage.controller.RepairController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.uit.garage.controller.RepairController">
     <VBox spacing="10">
-        <Label text="PHIẾU SỬA CHỮA" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-        <padding>
-            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
-        </padding>
+        <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="PHIẾU SỬA CHỮA" />
         <GridPane hgap="10" vgap="10">
-            <Label text="Biển số:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <TextField fx:id="licenseField" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Biển số:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="licenseField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-            <Label text="Ngày sửa chữa:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <DatePicker fx:id="repairDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Ngày sửa chữa:" GridPane.rowIndex="2" />
+            <DatePicker fx:id="repairDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+          <TableView fx:id="receiptTable" prefHeight="150" GridPane.columnIndex="1" GridPane.rowIndex="1">
+              <columns>
+                  <TableColumn fx:id="colReceiptId" prefWidth="80" text="Mã phiếu" />
+                  <TableColumn fx:id="colLicense" prefWidth="120" text="Biển số" />
+                  <TableColumn fx:id="colDate" prefWidth="120" text="Ngày tiếp nhận" />
+              </columns>
+          </TableView>
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
         </GridPane>
 
         <TableView fx:id="repairTable" editable="true" prefHeight="300">
             <columns>
-                <TableColumn fx:id="colContent" text="Nội Dung" prefWidth="150" />
-                <TableColumn fx:id="colPart" text="Vật Tư Phụ Tùng" prefWidth="150" />
-                <TableColumn fx:id="colQuantity" text="Số Lượng" prefWidth="80" />
-                <TableColumn fx:id="colPrice" text="Đơn Giá" prefWidth="100" />
-                <TableColumn fx:id="colLaborCost" text="Tiền Công" prefWidth="100" />
-                <TableColumn fx:id="colTotal" text="Thành Tiền" prefWidth="120" />
+                <TableColumn fx:id="colContent" prefWidth="150" text="Nội Dung" />
+                <TableColumn fx:id="colPart" prefWidth="150" text="Vật Tư Phụ Tùng" />
+                <TableColumn fx:id="colQuantity" prefWidth="80" text="Số Lượng" />
+                <TableColumn fx:id="colPrice" prefWidth="100" text="Đơn Giá" />
+                <TableColumn fx:id="colLaborCost" prefWidth="100" text="Tiền Công" />
+                <TableColumn fx:id="colTotal" prefWidth="120" text="Thành Tiền" />
             </columns>
         </TableView>
 
         <HBox spacing="10">
-            <Button text="➕ Thêm dòng" onAction="#handleAddRow" />
-            <Button text="Xem sửa chữa" onAction="#handleViewRepair" />
-            <Button text="Lưu" onAction="#handleSaveRepair" />
-            <Button text="Làm mới" onAction="#handleReset" />
+            <Button onAction="#handleAddRow" text="➕ Thêm dòng" />
+            <Button onAction="#handleViewRepair" text="Xem sửa chữa" />
+            <Button onAction="#handleSaveRepair" text="Lưu" />
+            <Button onAction="#handleReset" text="Làm mới" />
         </HBox>
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
 
     </VBox>
+    <Label style="-fx-font-weight: bold;" text="Danh sách phiếu tiếp nhận" />
+
 </AnchorPane>

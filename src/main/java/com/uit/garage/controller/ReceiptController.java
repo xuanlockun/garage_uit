@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ReceiptController {
 
@@ -17,6 +18,12 @@ public class ReceiptController {
     @FXML private TextField addressField;
     @FXML private TextField phoneField;
     @FXML private DatePicker receiptDatePicker;
+    @FXML private TextField searchField;
+    @FXML private TableView<Customer> customerTable;
+    @FXML private TableColumn<Customer, String> nameColumn;
+    @FXML private TableColumn<Customer, String> addressColumn;
+    @FXML private TableColumn<Customer, String> phoneColumn;
+
 
     private final ReceiptDAO receiptDAO = new ReceiptDAO();
 
@@ -61,6 +68,29 @@ public class ReceiptController {
         addressField.clear();
         phoneField.clear();
         receiptDatePicker.setValue(null);
+    }
+    @FXML
+    public void initialize() {
+        nameColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getName()));
+        addressColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getAddress()));
+        phoneColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getPhone()));
+
+        customerTable.setOnMouseClicked(event -> {
+            Customer selected = customerTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                ownerNameField.setText(selected.getName());
+                addressField.setText(selected.getAddress());
+                phoneField.setText(selected.getPhone());
+            }
+        });
+    }
+    @FXML
+    private void handleSearchCustomer() {
+        String keyword = searchField.getText().trim();
+        if (!keyword.isEmpty()) {
+            List<Customer> foundCustomers = receiptDAO.searchCustomerByName(keyword);
+            customerTable.getItems().setAll(foundCustomers);
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

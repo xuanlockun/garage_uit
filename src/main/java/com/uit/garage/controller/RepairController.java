@@ -3,7 +3,10 @@ package com.uit.garage.controller;
 import com.uit.garage.dao.PartsDAO;
 import com.uit.garage.dao.RepairDAO;
 import com.uit.garage.model.Part;
+import com.uit.garage.model.ReceiptRow;
 import com.uit.garage.model.RepairDetail;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +23,12 @@ public class RepairController {
     @FXML private TextField licenseField;
     @FXML private DatePicker repairDatePicker;
     @FXML private TableView<RepairDetail> repairTable;
+    @FXML private TableView<ReceiptRow> receiptTable;
+    @FXML private TableColumn<ReceiptRow, Integer> colReceiptId;
+    @FXML private TableColumn<ReceiptRow, String> colLicense;
+    @FXML private TableColumn<ReceiptRow, String> colDate;
+
+    private final ObservableList<ReceiptRow> receiptList = FXCollections.observableArrayList();
 
     @FXML private TableColumn<RepairDetail, String> colContent;
     @FXML private TableColumn<RepairDetail, Part> colPart;
@@ -72,6 +81,21 @@ public class RepairController {
 
         repairTable.setItems(repairData);
         repairTable.setEditable(true);
+        colReceiptId.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getId()).asObject());
+        colLicense.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getLicensePlate()));
+        colDate.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getReceiptDate()));
+
+        receiptTable.setItems(receiptList);
+        receiptTable.setOnMouseClicked(event -> {
+            ReceiptRow selected = receiptTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                licenseField.setText(selected.getLicensePlate());
+                repairDatePicker.setValue(LocalDate.parse(selected.getReceiptDate()));
+            }
+        });
+
+        loadReceiptList();
+
     }
 
     @FXML
@@ -97,6 +121,12 @@ public class RepairController {
             handleReset();
         } else {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu phiếu sửa chữa.");
+        }
+    }
+    private void loadReceiptList() {
+        receiptList.clear();
+        for (var r : repairDAO.getAllReceipts()) {
+            receiptList.add(new ReceiptRow(r.getId(), r.getLicensePlate(), r.getReceiptDate()));
         }
     }
 

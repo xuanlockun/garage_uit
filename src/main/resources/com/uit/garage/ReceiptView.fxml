@@ -36,6 +36,18 @@
             <Label text="Ngày tiếp nhận:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
             <DatePicker fx:id="receiptDatePicker" GridPane.rowIndex="5" GridPane.columnIndex="1" />
         </GridPane>
+        <HBox spacing="10">
+            <TextField fx:id="searchField" promptText="Nhập tên khách hàng..." />
+            <Button text="Tìm" onAction="#handleSearchCustomer" />
+        </HBox>
+
+        <TableView fx:id="customerTable" prefHeight="150">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Tên" prefWidth="150" />
+                <TableColumn fx:id="addressColumn" text="Địa chỉ" prefWidth="150" />
+                <TableColumn fx:id="phoneColumn" text="Điện thoại" prefWidth="100" />
+            </columns>
+        </TableView>
 
         <HBox spacing="10">
             <Button text="Lưu" onAction="#handleSave" />
