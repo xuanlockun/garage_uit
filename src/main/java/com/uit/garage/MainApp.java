@@ -10,9 +10,9 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/uit/garage/ReceiptView.fxml"));
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/uit/garage/RepairView.fxml"));
-        primaryStage.setTitle("CRUD Navigation Demo");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/uit/garage/MainLayout.fxml"));
+
+        primaryStage.setTitle("Garage UIT");
         primaryStage.setScene(new Scene(loader.load(), 600, 400));
         primaryStage.show();
     }

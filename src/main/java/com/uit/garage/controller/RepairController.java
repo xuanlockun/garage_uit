@@ -40,6 +40,8 @@ public class RepairController {
     private final ObservableList<RepairDetail> repairData = FXCollections.observableArrayList();
     private final RepairDAO repairDAO = new RepairDAO();
     private final PartsDAO partsDAO = new PartsDAO();
+    @FXML private TableColumn<ReceiptRow, String> colNote;
+    @FXML private TableColumn<ReceiptRow, String> colStatus;
 
     @FXML
     public void initialize() {
@@ -92,6 +94,8 @@ public class RepairController {
         colReceiptId.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getId()).asObject());
         colLicense.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getLicensePlate()));
         colDate.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getReceiptDate()));
+        colNote.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNote()));
+        colStatus.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
 
         receiptTable.setItems(receiptList);
         receiptTable.setOnMouseClicked(event -> {
@@ -133,7 +137,10 @@ public class RepairController {
     private void loadReceiptList() {
         receiptList.clear();
         for (var r : repairDAO.getAllReceipts()) {
-            receiptList.add(new ReceiptRow(r.getId(), r.getLicensePlate(), r.getReceiptDate()));
+            receiptList.add(new ReceiptRow(
+                    r.getId(), r.getLicensePlate(), r.getReceiptDate(),
+                    r.getNote(), r.getStatus()
+            ));
         }
     }
 
@@ -167,5 +174,22 @@ public class RepairController {
 
         repairData.setAll(details);
     }
+    @FXML
+    private void handleMarkDoneAndCreateInvoice() {
+        ReceiptRow selectedReceipt = receiptTable.getSelectionModel().getSelectedItem();
+        if (selectedReceipt == null) {
+            showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng chọn phiếu tiếp nhận để tạo hóa đơn.");
+            return;
+        }
+
+        boolean success = repairDAO.markReceiptDoneAndCreateInvoice(selectedReceipt.getId());
+        if (success) {
+            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã tạo hóa đơn cho phiếu tiếp nhận này.");
+            loadReceiptList(); // Refresh lại danh sách
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo hóa đơn.");
+        }
+    }
+
 
 }

@@ -12,14 +12,19 @@ public class MainController {
     @FXML
     private AnchorPane contentPane;
 
-    public void showUserView() {
-        loadView("/com/uit/garage/UserView.fxml");
+    public void ShowReceipt() {
+        loadView("/com/uit/garage/ReceiptView.fxml");
     }
 
-    public void showProductView() {
-        loadView("/com/uit/garage/ProductView.fxml");
+    public void ShowRepair() {
+        loadView("/com/uit/garage/RepairView.fxml");
     }
-
+    public void ShowCustomer() {
+        loadView("/com/uit/garage/CustomerView.fxml");
+    }
+    public void ShowInvoice() {
+        loadView("/com/uit/garage/InvoiceView.fxml");
+    }
     private void loadView(String fxmlPath) {
         try {
             Node view = FXMLLoader.load(getClass().getResource(fxmlPath));

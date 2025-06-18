@@ -6,19 +6,18 @@ public class Receipt {
     private int id;
     private int vehicleId;
     private LocalDate receiptDate;
+    private String note;
 
-    public Receipt(int vehicleId, LocalDate receiptDate) {
+    public Receipt(int vehicleId, LocalDate receiptDate, String note) {
         this.vehicleId = vehicleId;
         this.receiptDate = receiptDate;
+        this.note = note;
     }
 
-    public Receipt(int id, int vehicleId, LocalDate receiptDate) {
-        this.id = id;
-        this.vehicleId = vehicleId;
-        this.receiptDate = receiptDate;
-    }
 
     // Getters & Setters
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public int getVehicleId() { return vehicleId; }

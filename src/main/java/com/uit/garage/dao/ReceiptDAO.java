@@ -68,12 +68,14 @@ public class ReceiptDAO {
     }
 
     public void insertReceipt(Receipt receipt) throws SQLException {
-        String sql = "INSERT INTO receipts(vehicle_id, receipt_date) VALUES (?, ?)";
+        String sql = "INSERT INTO receipts(vehicle_id, receipt_date, note) VALUES (?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, receipt.getVehicleId());
             stmt.setString(2, receipt.getReceiptDate().toString());
+            stmt.setString(3, receipt.getNote()); // 📝 thêm note
             stmt.executeUpdate();
         }
     }
+
 }

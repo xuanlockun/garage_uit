@@ -34,30 +34,50 @@ public class DBUtil {
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "vehicle_id INTEGER, " +
                     "receipt_date TEXT, " +
+                    "note TEXT, " +
+                    "status TEXT DEFAULT 'pending', " +
                     "FOREIGN KEY(vehicle_id) REFERENCES vehicles(id))";
             stmt.execute(receiptTable);
 
-            // ✅ Bảng parts
             String partsTable = "CREATE TABLE IF NOT EXISTS parts (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "name TEXT NOT NULL, " +
                     "price REAL NOT NULL)";
             stmt.execute(partsTable);
 
-            // ✅ Bảng repair_details
             String repairDetailTable = "CREATE TABLE IF NOT EXISTS repair_details (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "receipt_id INTEGER, " +
-                    "content TEXT, " +                         // ✅ dòng này là bắt buộc
+                    "invoice_id INTEGER, " +
+                    "content TEXT, " +
                     "part_id INTEGER, " +
                     "quantity INTEGER, " +
                     "price REAL, " +
                     "labor_cost REAL, " +
                     "total REAL, " +
-                    "status TEXT DEFAULT 'pending'," +
                     "FOREIGN KEY(receipt_id) REFERENCES receipts(id), " +
-                    "FOREIGN KEY(part_id) REFERENCES parts(id))";
+                    "FOREIGN KEY(part_id) REFERENCES parts(id), " +
+                    "FOREIGN KEY(invoice_id) REFERENCES invoices(id)" +
+                    ")";
             stmt.execute(repairDetailTable);
+
+            String invoiceTable = "CREATE TABLE IF NOT EXISTS invoices (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "receipt_id INTEGER, " +
+                    "vehicle_id INTEGER, " +
+                    "customer_id INTEGER, " +
+                    "total_amount REAL, " +
+                    "FOREIGN KEY(receipt_id) REFERENCES receipts(id), " +
+                    "FOREIGN KEY(vehicle_id) REFERENCES vehicles(id), " +
+                    "FOREIGN KEY(customer_id) REFERENCES customers(id))";
+            stmt.execute(invoiceTable);
+            String paymentTable = "CREATE TABLE IF NOT EXISTS payments (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "invoice_id INTEGER, " +
+                    "payment_date TEXT, " +
+                    "amount REAL, " +
+                    "FOREIGN KEY(invoice_id) REFERENCES invoices(id))";
+            stmt.execute(paymentTable);
 
         } catch (SQLException e) {
             e.printStackTrace();

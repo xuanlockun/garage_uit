@@ -23,6 +23,9 @@ public class ReceiptController {
     @FXML private TableColumn<Customer, String> nameColumn;
     @FXML private TableColumn<Customer, String> addressColumn;
     @FXML private TableColumn<Customer, String> phoneColumn;
+    @FXML private TextArea noteArea;
+
+
 
 
     private final ReceiptDAO receiptDAO = new ReceiptDAO();
@@ -47,8 +50,8 @@ public class ReceiptController {
 
             Vehicle vehicle = new Vehicle(license, brand, customerId);
             int vehicleId = receiptDAO.insertVehicle(vehicle);
-
-            Receipt receipt = new Receipt(vehicleId, date);
+            String note = noteArea.getText();
+            Receipt receipt = new Receipt(vehicleId, date, note);
             receiptDAO.insertReceipt(receipt);
 
             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu thông tin tiếp nhận xe.");
@@ -67,6 +70,7 @@ public class ReceiptController {
         brandField.clear();
         addressField.clear();
         phoneField.clear();
+        noteArea.clear();
         receiptDatePicker.setValue(null);
     }
     @FXML

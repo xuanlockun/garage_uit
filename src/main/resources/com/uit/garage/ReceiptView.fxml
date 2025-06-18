@@ -35,6 +35,9 @@
 
             <Label text="Ngày tiếp nhận:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
             <DatePicker fx:id="receiptDatePicker" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+            <Label text="Ghi chú sửa chữa:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+            <TextArea fx:id="noteArea" prefRowCount="3" GridPane.rowIndex="6" GridPane.columnIndex="1" />
         </GridPane>
         <HBox spacing="10">
             <TextField fx:id="searchField" promptText="Nhập tên khách hàng..." />

@@ -14,8 +14,11 @@
     <top>
         <MenuBar>
             <Menu text="Navigate">
-                <MenuItem text="User" onAction="#showUserView"/>
-                <MenuItem text="Product" onAction="#showProductView"/>
+                <MenuItem text="Receipt" onAction="#ShowReceipt"/>
+                <MenuItem text="Repair" onAction="#ShowRepair"/>
+                <MenuItem text="Customer" onAction="#ShowCustomer"/>                <MenuItem text="Product" onAction="#ShowCustomer"/>
+                <MenuItem text="Invoice" onAction="#ShowInvoice"/>
+
             </Menu>
         </MenuBar>
     </top>

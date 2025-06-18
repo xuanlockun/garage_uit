@@ -122,10 +122,12 @@ public class RepairDAO {
     public List<ReceiptDisplay> getAllReceipts() {
         List<ReceiptDisplay> result = new ArrayList<>();
         String sql = """
-        SELECT receipts.id AS id, vehicles.license_plate AS license, receipts.receipt_date AS date
-        FROM receipts
-        JOIN vehicles ON receipts.vehicle_id = vehicles.id
-        ORDER BY receipts.id DESC
+            SELECT receipts.id AS id, vehicles.license_plate AS license, receipts.receipt_date AS date,
+                   receipts.note AS note, receipts.status AS status
+            FROM receipts
+            JOIN vehicles ON receipts.vehicle_id = vehicles.id
+            ORDER BY receipts.id DESC
+
     """;
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -136,7 +138,9 @@ public class RepairDAO {
                 result.add(new ReceiptDisplay(
                         rs.getInt("id"),
                         rs.getString("license"),
-                        rs.getString("date")
+                        rs.getString("date"),
+                        rs.getString("note"),
+                        rs.getString("status")
                 ));
             }
 
@@ -148,8 +152,8 @@ public class RepairDAO {
     }
     public boolean insertRepairDetails(int receiptId, List<RepairDetail> details) {
         String insertSql = """
-        INSERT INTO repair_details (receipt_id, content, part_id, quantity, price, labor_cost, total, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO repair_details (receipt_id, content, part_id, quantity, price, labor_cost, total)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """;
 
         String updateSql = """
@@ -189,6 +193,73 @@ public class RepairDAO {
             conn.commit();
             return true;
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean markReceiptDoneAndCreateInvoice(int receiptId) {
+        String updateStatusSql = "UPDATE receipts SET status = 'done' WHERE id = ?";
+        String totalSql = "SELECT SUM(total) FROM repair_details WHERE receipt_id = ?";
+        String findVehicleCustomerSql = "SELECT vehicles.id AS vehicle_id, customers.id AS customer_id FROM vehicles JOIN receipts ON receipts.vehicle_id = vehicles.id JOIN customers ON vehicles.customer_id = customers.id WHERE receipts.id = ?";
+        String insertInvoiceSql = "INSERT INTO invoices (receipt_id, vehicle_id, customer_id, total_amount) VALUES (?, ?, ?, ?)";
+        String updateRepairDetailsSql = "UPDATE repair_details SET invoice_id = ? WHERE receipt_id = ?";
+
+        try (Connection conn = DBUtil.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (
+                    PreparedStatement updateStatusStmt = conn.prepareStatement(updateStatusSql);
+                    PreparedStatement totalStmt = conn.prepareStatement(totalSql);
+                    PreparedStatement findVehicleCustomerStmt = conn.prepareStatement(findVehicleCustomerSql);
+                    PreparedStatement insertInvoiceStmt = conn.prepareStatement(insertInvoiceSql, Statement.RETURN_GENERATED_KEYS);
+                    PreparedStatement updateRepairDetailsStmt = conn.prepareStatement(updateRepairDetailsSql);
+            ) {
+                // 1. Cập nhật trạng thái done cho receipt
+                updateStatusStmt.setInt(1, receiptId);
+                updateStatusStmt.executeUpdate();
+
+                // 2. Tính tổng tiền sửa chữa
+                totalStmt.setInt(1, receiptId);
+                ResultSet rsTotal = totalStmt.executeQuery();
+                double totalAmount = rsTotal.next() ? rsTotal.getDouble(1) : 0.0;
+
+                // 3. Lấy vehicle_id và customer_id từ receipt
+                findVehicleCustomerStmt.setInt(1, receiptId);
+                ResultSet rsInfo = findVehicleCustomerStmt.executeQuery();
+                if (!rsInfo.next()) {
+                    conn.rollback();
+                    return false;
+                }
+                int vehicleId = rsInfo.getInt("vehicle_id");
+                int customerId = rsInfo.getInt("customer_id");
+
+                // 4. Thêm invoice
+                insertInvoiceStmt.setInt(1, receiptId);
+                insertInvoiceStmt.setInt(2, vehicleId);
+                insertInvoiceStmt.setInt(3, customerId);
+                insertInvoiceStmt.setDouble(4, totalAmount);
+                insertInvoiceStmt.executeUpdate();
+
+                ResultSet generatedKeys = insertInvoiceStmt.getGeneratedKeys();
+                if (!generatedKeys.next()) {
+                    conn.rollback();
+                    return false;
+                }
+                int invoiceId = generatedKeys.getInt(1);
+
+                // 5. Gán invoice_id vào các repair_details
+                updateRepairDetailsStmt.setInt(1, invoiceId);
+                updateRepairDetailsStmt.setInt(2, receiptId);
+                updateRepairDetailsStmt.executeUpdate();
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

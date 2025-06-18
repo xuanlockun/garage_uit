@@ -22,6 +22,8 @@
                <TableColumn fx:id="colReceiptId" prefWidth="80" text="Mã phiếu" />
                <TableColumn fx:id="colLicense" prefWidth="120" text="Biển số" />
                <TableColumn fx:id="colDate" prefWidth="120" text="Ngày tiếp nhận" />
+               <TableColumn fx:id="colNote" prefWidth="120" text="Ghi chú sữa chữa" />
+               <TableColumn fx:id="colStatus" prefWidth="120" text="Trạng thái" />
            </columns>
        </TableView>
         <GridPane hgap="10" vgap="10">
@@ -56,6 +58,7 @@
             <Button onAction="#handleAddRow" text="➕ Thêm dòng" />
             <Button onAction="#handleViewRepair" text="Xem sửa chữa" />
             <Button onAction="#handleSaveRepair" text="Lưu" />
+            <Button fx:id="btnDone" text="Done (Tạo hóa đơn)" onAction="#handleMarkDoneAndCreateInvoice"/>
             <Button onAction="#handleReset" text="Làm mới" />
         </HBox>
         <padding>
