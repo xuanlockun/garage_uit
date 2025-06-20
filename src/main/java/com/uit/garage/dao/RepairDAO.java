@@ -150,54 +150,7 @@ public class RepairDAO {
 
         return result;
     }
-    public boolean insertRepairDetails(int receiptId, List<RepairDetail> details) {
-        String insertSql = """
-        INSERT INTO repair_details (receipt_id, content, part_id, quantity, price, labor_cost, total)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """;
 
-        String updateSql = """
-        UPDATE repair_details SET content = ?, part_id = ?, quantity = ?, price = ?, labor_cost = ?, total = ?
-        WHERE id = ?
-    """;
-
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            conn.setAutoCommit(false);
-
-            for (RepairDetail detail : details) {
-                if (detail.getId() != null && detail.getId() > 0) {
-                    try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
-                        stmt.setString(1, detail.getContent());
-                        stmt.setInt(2, detail.getPart().getId());
-                        stmt.setInt(3, detail.getQuantity());
-                        stmt.setDouble(4, detail.getPrice());
-                        stmt.setDouble(5, detail.getLaborCost());
-                        stmt.setDouble(6, detail.getTotal());
-                        stmt.setInt(7, detail.getId());
-                        stmt.executeUpdate();
-                    }
-                } else {
-                    try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
-                        stmt.setInt(1, receiptId);
-                        stmt.setString(2, detail.getContent());
-                        stmt.setInt(3, detail.getPart().getId());
-                        stmt.setInt(4, detail.getQuantity());
-                        stmt.setDouble(5, detail.getPrice());
-                        stmt.setDouble(6, detail.getLaborCost());
-                        stmt.setDouble(7, detail.getTotal());
-                        stmt.executeUpdate();
-                    }
-                }
-            }
-
-            conn.commit();
-            return true;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
     public boolean markReceiptDoneAndCreateInvoice(int receiptId) {
         String updateStatusSql = "UPDATE receipts SET status = 'done' WHERE id = ?";
         String totalSql = "SELECT SUM(total) FROM repair_details WHERE receipt_id = ?";
@@ -264,6 +217,72 @@ public class RepairDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean insertRepairDetails(int receiptId, List<RepairDetail> newDetails) {
+        String deleteSql = "DELETE FROM repair_details WHERE receipt_id = ?";
+        String insertSql = "INSERT INTO repair_details (receipt_id, content, part_id, quantity, price, labor_cost, total) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String selectOldSql = "SELECT part_id, quantity FROM repair_details WHERE receipt_id = ?";
+
+        try (Connection conn = DBUtil.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectOldSql)) {
+                selectStmt.setInt(1, receiptId);
+                ResultSet rs = selectStmt.executeQuery();
+                while (rs.next()) {
+                    int oldPartId = rs.getInt("part_id");
+                    int oldQty = rs.getInt("quantity");
+
+                    boolean recovered = StockDAO.adjustStock(
+                            conn, oldPartId, LocalDate.now(), oldQty,
+                            "Hoàn kho vì cập nhật phiếu sửa chữa #" + receiptId,
+                            "import"
+                    );
+                    if (!recovered) {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+            }
+
+            try (PreparedStatement delStmt = conn.prepareStatement(deleteSql)) {
+                delStmt.setInt(1, receiptId);
+                delStmt.executeUpdate();
+            }
+
+            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                for (RepairDetail detail : newDetails) {
+                    insertStmt.setInt(1, receiptId);
+                    insertStmt.setString(2, detail.getContent());
+                    insertStmt.setInt(3, detail.getPart().getId());
+                    insertStmt.setInt(4, detail.getQuantity());
+                    insertStmt.setDouble(5, detail.getPrice());
+                    insertStmt.setDouble(6, detail.getLaborCost());
+                    insertStmt.setDouble(7, detail.getTotal());
+                    insertStmt.addBatch();
+
+                    boolean stockUpdated = StockDAO.adjustStock(
+                            conn, detail.getPart().getId(), LocalDate.now(), detail.getQuantity(),
+                            "Xuất kho cho cập nhật phiếu sửa chữa #" + receiptId,
+                            "export"
+                    );
+                    if (!stockUpdated) {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+
+                insertStmt.executeBatch();
+                conn.commit();
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }

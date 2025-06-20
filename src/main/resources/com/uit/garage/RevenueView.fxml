@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.uit.garage.controller.RevenueController" spacing="10" alignment="TOP_CENTER">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Tháng:"/>
+        <ComboBox fx:id="monthBox" prefWidth="100"/>
+        <Label text="Năm:"/>
+        <ComboBox fx:id="yearBox" prefWidth="100"/>
+        <Button text="Thống kê" onAction="#handleStatistics"/>
+    </HBox>
+
+    <Label fx:id="totalRevenueLabel" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+
+    <TableView fx:id="revenueTable" prefHeight="400" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="colStt" text="STT" prefWidth="50"/>
+            <TableColumn fx:id="colBrand" text="Hiệu Xe" prefWidth="150"/>
+            <TableColumn fx:id="colCount" text="Số Lượt Sửa" prefWidth="100"/>
+            <TableColumn fx:id="colAmount" text="Thành Tiền" prefWidth="150"/>
+            <TableColumn fx:id="colRate" text="Tỉ Lệ (%)" prefWidth="100"/>
+        </columns>
+    </TableView>
+</VBox>

@@ -13,12 +13,16 @@
 
     <top>
         <MenuBar>
-            <Menu text="Navigate">
+            <Menu text="Menu">
                 <MenuItem text="Receipt" onAction="#ShowReceipt"/>
                 <MenuItem text="Repair" onAction="#ShowRepair"/>
-                <MenuItem text="Customer" onAction="#ShowCustomer"/>                <MenuItem text="Product" onAction="#ShowCustomer"/>
                 <MenuItem text="Invoice" onAction="#ShowInvoice"/>
-
+            </Menu>
+            <Menu text="Database">
+                <MenuItem text="Customer" onAction="#ShowCustomer"/>
+                <MenuItem text="Revenue" onAction="#ShowRevenue"/>
+                <MenuItem text="ImportStock" onAction="#ShowIStock"/>
+                <MenuItem text="StockReport" onAction="#ShowStockReport"/>
             </Menu>
         </MenuBar>
     </top>

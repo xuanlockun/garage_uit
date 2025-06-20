@@ -78,6 +78,23 @@ public class DBUtil {
                     "amount REAL, " +
                     "FOREIGN KEY(invoice_id) REFERENCES invoices(id))";
             stmt.execute(paymentTable);
+            String stockTable = "CREATE TABLE IF NOT EXISTS stock ("+
+                    "part_id INTEGER PRIMARY KEY," +
+                    "quantity INTEGER NOT NULL DEFAULT 0," +
+                    "FOREIGN KEY(part_id) REFERENCES parts(id)" +
+            ");";
+            stmt.execute(stockTable);
+            String stockTransTable = "CREATE TABLE IF NOT EXISTS stock_transactions (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "part_id INTEGER," +
+                    "transaction_date TEXT," +
+                    "type TEXT CHECK(type IN ('import', 'export'))," +
+                    "quantity INTEGER," +
+                    "note TEXT," +
+                    "FOREIGN KEY(part_id) REFERENCES parts(id)" +
+            ");";
+            stmt.execute(stockTransTable);
+
 
         } catch (SQLException e) {
             e.printStackTrace();

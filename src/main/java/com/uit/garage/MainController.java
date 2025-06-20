@@ -25,6 +25,15 @@ public class MainController {
     public void ShowInvoice() {
         loadView("/com/uit/garage/InvoiceView.fxml");
     }
+    public void ShowRevenue() {
+        loadView("/com/uit/garage/RevenueView.fxml");
+    }
+    public void ShowIStock() {
+        loadView("/com/uit/garage/ImportStock.fxml");
+    }
+    public void ShowStockReport() {
+        loadView("/com/uit/garage/StockReport.fxml");
+    }
     private void loadView(String fxmlPath) {
         try {
             Node view = FXMLLoader.load(getClass().getResource(fxmlPath));
