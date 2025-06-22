@@ -13,9 +13,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 
 public class RepairController {
@@ -27,7 +29,7 @@ public class RepairController {
     @FXML private TableColumn<ReceiptRow, Integer> colReceiptId;
     @FXML private TableColumn<ReceiptRow, String> colLicense;
     @FXML private TableColumn<ReceiptRow, String> colDate;
-
+    private final DecimalFormat df = new DecimalFormat("#,###.##");
     private final ObservableList<ReceiptRow> receiptList = FXCollections.observableArrayList();
 
     @FXML private TableColumn<RepairDetail, String> colContent;
@@ -74,21 +76,33 @@ public class RepairController {
         });
 
         colPrice.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
-        colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        colPrice.setCellFactory(TextFieldTableCell.forTableColumn(formattedDoubleConverter));
         colPrice.setOnEditCommit(e -> {
             e.getRowValue().setPrice(e.getNewValue());
             e.getRowValue().recalculateTotal();
         });
 
         colLaborCost.setCellValueFactory(cellData -> cellData.getValue().laborCostProperty().asObject());
-        colLaborCost.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        colLaborCost.setCellFactory(TextFieldTableCell.forTableColumn(formattedDoubleConverter));
         colLaborCost.setOnEditCommit(e -> {
             e.getRowValue().setLaborCost(e.getNewValue());
             e.getRowValue().recalculateTotal();
         });
 
         colTotal.setCellValueFactory(cellData -> cellData.getValue().totalProperty().asObject());
+        colTotal.setCellFactory(column -> new TableCell<RepairDetail, Double>() {
+            private final DecimalFormat formatter = new DecimalFormat("#,###.##");
 
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) {
+                    setText(null);
+                } else {
+                    setText(formatter.format(value));
+                }
+            }
+        });
         repairTable.setItems(repairData);
         repairTable.setEditable(true);
         colReceiptId.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getId()).asObject());
@@ -103,6 +117,7 @@ public class RepairController {
             if (selected != null) {
                 licenseField.setText(selected.getLicensePlate());
                 repairDatePicker.setValue(LocalDate.parse(selected.getReceiptDate()));
+                handleViewRepair();
             }
         });
 
@@ -130,7 +145,7 @@ public class RepairController {
             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu sửa chữa.");
             handleReset();
         } else {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu phiếu sửa chữa.");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không đủ hàng trong kho để xuất.");
         }
     }
 
@@ -191,5 +206,22 @@ public class RepairController {
         }
     }
 
+    private final StringConverter<Double> formattedDoubleConverter = new StringConverter<>() {
+        @Override
+        public String toString(Double value) {
+            if (value == null) return "";
+            return df.format(value);
+        }
 
+        @Override
+        public Double fromString(String string) {
+            if (string == null || string.isEmpty()) return 0.0;
+            try {
+                // Xoá dấu phẩy khi parse
+                return Double.parseDouble(string.replace(",", ""));
+            } catch (NumberFormatException e) {
+                return 0.0;
+            }
+        }
+    };
 }

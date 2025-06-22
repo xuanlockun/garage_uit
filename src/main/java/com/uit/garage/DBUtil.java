@@ -12,7 +12,12 @@ public class DBUtil {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
 
-            String userTable = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT)";
+            String userTable = "CREATE TABLE IF NOT EXISTS users (" +
+                    "    id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "    username TEXT NOT NULL UNIQUE," +
+                    "    password TEXT NOT NULL," +
+                    "    role TEXT NOT NULL CHECK(role IN ('admin', 'staff'))" +
+                    ");";
             stmt.execute(userTable);
 
             String customerTable = "CREATE TABLE IF NOT EXISTS customers (" +

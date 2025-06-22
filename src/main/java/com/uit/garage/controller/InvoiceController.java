@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import com.uit.garage.dao.InvoiceDAO;
 import com.uit.garage.model.InvoiceRow;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class InvoiceController {
     @FXML private TableColumn<InvoiceRow, Double> colTotal;
     @FXML private TableColumn<InvoiceRow, Void> colDetail;
     @FXML private TableColumn<InvoiceRow, Void> colPayment;
+    private final DecimalFormat moneyFormat = new DecimalFormat("#,###.##");
 
 
     private final ObservableList<InvoiceRow> invoiceList = FXCollections.observableArrayList();
@@ -38,6 +40,19 @@ public class InvoiceController {
         colBrand.setCellValueFactory(new PropertyValueFactory<>("brand"));
         colCustomer.setCellValueFactory(new PropertyValueFactory<>("customerName"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
+        colTotal.setCellFactory(col -> new TableCell<InvoiceRow, Double>() {
+            private final DecimalFormat moneyFormat = new DecimalFormat("#,###.##");
+
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) {
+                    setText(null);
+                } else {
+                    setText(moneyFormat.format(value));
+                }
+            }
+        });
 
         colDetail.setCellFactory(param -> new TableCell<>() {
             private final Button btn = new Button("Chi tiết");
@@ -101,12 +116,15 @@ public class InvoiceController {
 
         TableColumn<RepairDetail, Double> priceCol = new TableColumn<>("Đơn giá");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceCol.setCellFactory(col -> getFormattedMoneyCell());
 
         TableColumn<RepairDetail, Double> laborCol = new TableColumn<>("Tiền công");
         laborCol.setCellValueFactory(new PropertyValueFactory<>("laborCost"));
+        laborCol.setCellFactory(col -> getFormattedMoneyCell());
 
         TableColumn<RepairDetail, Double> totalCol = new TableColumn<>("Thành tiền");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+        totalCol.setCellFactory(col -> getFormattedMoneyCell());
 
         detailTable.getColumns().addAll(contentCol, partCol, quantityCol, priceCol, laborCol, totalCol);
         detailTable.setItems(FXCollections.observableArrayList(details));
@@ -117,7 +135,7 @@ public class InvoiceController {
                 new Label("Chủ xe: " + invoice.getCustomerName()),
                 new Label("Biển số: " + invoice.getLicensePlate()),
                 new Label("Hiệu xe: " + invoice.getBrand()),
-                new Label("Tổng tiền: " + invoice.getTotalAmount() + " VND"),
+                new Label("Tổng tiền: " + moneyFormat.format(invoice.getTotalAmount()) + " VND"),
                 detailTable
         );
         vbox.setPrefSize(700, 400);
@@ -149,11 +167,20 @@ public class InvoiceController {
             if (button == ButtonType.OK) {
                 try {
                     double amount = Double.parseDouble(amountField.getText());
+                    double total = invoice.getTotalAmount();
+
+                    if (amount > total) {
+                        Alert error = new Alert(Alert.AlertType.WARNING, "Số tiền thu không được vượt quá tổng tiền (" + total + " VND)!");
+                        error.showAndWait();
+                        return null;
+                    }
+
                     LocalDate now = LocalDate.now();
                     boolean success = PaymentDAO.insertPayment(invoice.getStt(), now, amount);
                     if (success) {
                         Alert successAlert = new Alert(Alert.AlertType.INFORMATION, "Đã thu tiền thành công!");
                         successAlert.showAndWait();
+                        loadInvoices();
                     } else {
                         Alert error = new Alert(Alert.AlertType.ERROR, "Lưu thanh toán thất bại!");
                         error.showAndWait();
@@ -168,4 +195,21 @@ public class InvoiceController {
 
         dialog.showAndWait();
     }
+
+
+    // TableCell dùng cho các cột hiển thị tiền
+    private TableCell<RepairDetail, Double> getFormattedMoneyCell() {
+        return new TableCell<>() {
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) {
+                    setText(null);
+                } else {
+                    setText(moneyFormat.format(value));
+                }
+            }
+        };
+    }
+
 }

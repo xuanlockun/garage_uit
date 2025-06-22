@@ -6,6 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -18,7 +19,7 @@
                 <MenuItem text="Repair" onAction="#ShowRepair"/>
                 <MenuItem text="Invoice" onAction="#ShowInvoice"/>
             </Menu>
-            <Menu text="Database">
+            <Menu fx:id="databaseMenu" text="Database">
                 <MenuItem text="Customer" onAction="#ShowCustomer"/>
                 <MenuItem text="Revenue" onAction="#ShowRevenue"/>
                 <MenuItem text="ImportStock" onAction="#ShowIStock"/>
@@ -28,6 +29,12 @@
     </top>
 
     <center>
-        <AnchorPane fx:id="contentPane"/>
+        <StackPane fx:id="contentPane">
+            <Label fx:id="helloLabel" text="Hello, User">
+                <font>
+                    <Font size="36"/>
+                </font>
+            </Label>
+        </StackPane>
     </center>
 </BorderPane>

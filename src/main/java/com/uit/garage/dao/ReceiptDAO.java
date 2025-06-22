@@ -1,5 +1,6 @@
 package com.uit.garage.dao;
 
+import com.uit.garage.DBUtil;
 import com.uit.garage.model.Customer;
 import com.uit.garage.model.Vehicle;
 import com.uit.garage.model.Receipt;
@@ -49,6 +50,26 @@ public class ReceiptDAO {
         }
 
         return customers;
+    }
+
+    public Vehicle findVehicleByLicensePlate(String licensePlate) {
+        String sql = "SELECT * FROM vehicles WHERE license_plate = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, licensePlate);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Vehicle(
+                        rs.getInt("id"),
+                        rs.getString("license_plate"),
+                        rs.getString("brand"),
+                        rs.getInt("customer_id")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

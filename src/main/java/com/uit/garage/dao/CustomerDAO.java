@@ -1,5 +1,6 @@
 package com.uit.garage.dao;
 
+import com.uit.garage.DBUtil;
 import com.uit.garage.model.Customer;
 
 import java.sql.*;
@@ -81,4 +82,26 @@ public class CustomerDAO {
 
         return 0;
     }
+
+    public Customer findCustomerByNameAndPhone(String name, String phone) {
+        String sql = "SELECT * FROM customers WHERE name = ? AND phone = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, phone);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Customer(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
