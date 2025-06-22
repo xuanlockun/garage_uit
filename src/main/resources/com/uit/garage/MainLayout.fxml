@@ -7,34 +7,38 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane xmlns="http://javafx.com/javafx"
+<AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.uit.garage.MainController">
+    <children>
+        <BorderPane prefWidth="1920" prefHeight="1080" AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0">
 
-    <top>
-        <MenuBar>
-            <Menu text="Menu">
-                <MenuItem text="Receipt" onAction="#ShowReceipt"/>
-                <MenuItem text="Repair" onAction="#ShowRepair"/>
-                <MenuItem text="Invoice" onAction="#ShowInvoice"/>
-            </Menu>
-            <Menu fx:id="databaseMenu" text="Database">
-                <MenuItem text="Customer" onAction="#ShowCustomer"/>
-                <MenuItem text="Revenue" onAction="#ShowRevenue"/>
-                <MenuItem text="ImportStock" onAction="#ShowIStock"/>
-                <MenuItem text="StockReport" onAction="#ShowStockReport"/>
-            </Menu>
-        </MenuBar>
-    </top>
+            <top>
+                <MenuBar>
+                    <Menu text="Menu">
+                        <MenuItem text="Receipt" onAction="#ShowReceipt"/>
+                        <MenuItem text="Repair" onAction="#ShowRepair"/>
+                        <MenuItem text="Invoice" onAction="#ShowInvoice"/>
+                    </Menu>
+                    <Menu fx:id="databaseMenu" text="Database">
+                        <MenuItem text="Customer" onAction="#ShowCustomer"/>
+                        <MenuItem text="Revenue" onAction="#ShowRevenue"/>
+                        <MenuItem text="ImportStock" onAction="#ShowIStock"/>
+                        <MenuItem text="StockReport" onAction="#ShowStockReport"/>
+                    </Menu>
+                </MenuBar>
+            </top>
 
-    <center>
-        <StackPane fx:id="contentPane">
-            <Label fx:id="helloLabel" text="Hello, User">
-                <font>
-                    <Font size="36"/>
-                </font>
-            </Label>
-        </StackPane>
-    </center>
-</BorderPane>
+            <center>
+                <StackPane fx:id="contentPane">
+                    <Label fx:id="helloLabel" text="Hello, User">
+                        <font>
+                            <Font size="36"/>
+                        </font>
+                    </Label>
+                </StackPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

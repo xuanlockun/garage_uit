@@ -14,7 +14,7 @@
             <TableColumn fx:id="colLicense" text="Biển Số" />
             <TableColumn fx:id="colBrand" text="Hiệu Xe" />
             <TableColumn fx:id="colCustomer" text="Chủ Xe" />
-            <TableColumn fx:id="colTotal" text="Tổng Tiền" />
+            <TableColumn fx:id="colTotal" text="Tổng Nợ" />
             <TableColumn fx:id="colDetail" text="Chi Tiết" />
             <TableColumn fx:id="colPayment" text="Thanh Toán" />
         </columns>

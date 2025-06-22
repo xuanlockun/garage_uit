@@ -37,7 +37,9 @@ public class LoginController {
 
                 Stage stage = (Stage) usernameField.getScene().getWindow();
                 stage.setScene(mainScene);
-                stage.setTitle("Garage Management - Role: " + role);
+                stage.setTitle("Garage UIT");
+                stage.setMaximized(true);
+//                stage.show();
             } else {
                 errorLabel.setText("Sai tài khoản hoặc mật khẩu.");
             }

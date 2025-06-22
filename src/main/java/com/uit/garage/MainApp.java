@@ -10,12 +10,13 @@ public class MainApp extends Application {
     public static String currentUsername = "";
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage    ) throws Exception {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/uit/garage/Login.fxml"));
 
         primaryStage.setTitle("Garage UIT");
         primaryStage.setScene(new Scene(loader.load(), 600, 400));
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
